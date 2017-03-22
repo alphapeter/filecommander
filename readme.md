@@ -2,6 +2,7 @@
 
 **TODO**
 * HTML interface
+* Configuration
 * document build steps
 
 # swfc
