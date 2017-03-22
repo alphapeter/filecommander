@@ -1,33 +1,21 @@
 package main
 
 import (
+	"./commands"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"os"
 )
 
 func main() {
-
-	files, _ := ioutil.ReadDir("c:/")
-
-	for _, file := range files {
-		if file.IsDir() {
-			fmt.Print("d ")
-		} else {
-			fmt.Print("f ")
-		}
-		fmt.Println(file.Name())
-	}
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
 			w.Write(html)
 			break
 		default:
-			w.Write([]byte("invalid request"))
+			w.WriteHeader(400)
+			w.Write([]byte("bad request"))
 		}
 	})
 
@@ -37,46 +25,62 @@ func main() {
 		}
 
 		decoder := json.NewDecoder(r.Body)
-		var command Command
-		err := decoder.Decode(&command)
-		if err != nil {
-			w.Write([]byte(err.Error()))
-			panic(err)
+		var command commands.Command
+
+		if err := decoder.Decode(&command); err != nil {
+			er, _ := json.Marshal(ErrorResponse{
+				Error: Error{
+					Code:    -32700,
+					Message: "could not parse JSON: " + err.Error(),
+				},
+				Id:         command.Id,
+				RpcVersion: "2.0",
+			})
+			w.Write(er)
+			return
 		}
+
 		defer r.Body.Close()
 		fmt.Print(command)
 		response := Response{Id: command.Id, RpcVersion: "2.0"}
 
+		var err error
 		switch command.Method {
-		case "move":
-			err = move(command.Params[0], command.Params[1])
-
-			if err != nil {
-				response.Error = Error{
-					Code:    -1,
-					Message: err.Error(),
-				}
-			} else {
-				response.Result = []string{"ok"}
-			}
-
-		case "copy":
-		case "delete":
+		case "mv":
+			err = commands.Move(command.Params[0], command.Params[1])
+			break
+		case "cp":
+			err = commands.Copy(command.Params[0], command.Params[1])
+			break
+		case "rm":
+			err = commands.Delete(command.Params[0])
+			break
 		case "ls":
+			response.Result, err = commands.Ls(command.Params[0])
+			break
+		case "df":
+			response.Result, err = commands.Df()
+			break
 		default:
-			response, _ := json.Marshal(Response{
-				Id: command.Id,
+			methodNotFound(command, &w)
+			return
+		}
+
+		if err != nil {
+			er, _ := json.Marshal(ErrorResponse{
 				Error: Error{
-					Code:    -1,
-					Message: "Method not found",
+					Code:    -32603,
+					Message: err.Error(),
 				},
-				Result:     nil,
+				Id:         command.Id,
 				RpcVersion: "2.0",
 			})
-			w.Write([]byte(response))
+			w.Write(er)
+			return
 		}
 		a, _ := json.Marshal(response)
 		w.Write(a)
+
 	})
 
 	err := http.ListenAndServe("0.0.0.0:8080", nil)
@@ -86,27 +90,27 @@ func main() {
 
 }
 
-func move(source string, dest string) error {
-	err := os.Rename(source, dest)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	return nil
-}
-
-type Command struct {
-	RpcVersion string   `josn:"jsonrpc"`
-	Method     string   `json:"method"`
-	Params     []string `json:"params"`
-	Id         string   `json:"id"`
+func methodNotFound(command commands.Command, w *http.ResponseWriter) {
+	response, _ := json.Marshal(ErrorResponse{
+		Id: command.Id,
+		Error: Error{
+			Code:    -32601,
+			Message: "Method not found",
+		},
+		RpcVersion: "2.0",
+	})
+	(*w).Write([]byte(response))
 }
 
 type Response struct {
-	RpcVersion string   `josn:"jsonrpc"`
-	Result     []string `json:"result"`
-	Id         string   `json:"id"`
-	Error      Error    `json:"error"`
+	RpcVersion string      `json:"jsonrpc"`
+	Result     interface{} `json:"result"`
+	Id         string      `json:"id"`
+}
+type ErrorResponse struct {
+	RpcVersion string `json:"jsonrpc"`
+	Id         string `json:"id"`
+	Error      Error  `json:"error"`
 }
 
 type Error struct {

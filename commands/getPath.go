@@ -1,6 +1,7 @@
 package commands
 
 import "strings"
+import "../cfg"
 
 func getPath(directory string) (string, error) {
 	if err := ValidatePath(directory); err != nil{
