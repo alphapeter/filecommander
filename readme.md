@@ -1,5 +1,11 @@
 #Work in progress
-#swfc 
+
+TODO
+* HTML interface
+* document build steps
+
+#swfc
+ 
 *Simple Web File Commander*
 
 ## About
