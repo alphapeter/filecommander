@@ -1,10 +1,10 @@
-#Work in progress
+# Work in progress
 
-TODO
+**TODO**
 * HTML interface
 * document build steps
 
-#swfc
+# swfc
  
 *Simple Web File Commander*
 
