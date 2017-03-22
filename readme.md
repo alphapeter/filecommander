@@ -47,7 +47,7 @@ Example of command:
 ```
 { 
   "jsonrpc":"2.0",
-  "method": "df",
+  "method": "cp",
   "params": ["private/animals/cat.jpg", "public/animals/cat.jpg"],
   "id": "3"
 }
