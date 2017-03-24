@@ -9,25 +9,63 @@
  
 *Simple Web File Commander*
 
-## About
+# About
 A simple web file commander implemented in the Go language. 
 It compiles into one single binary which bundles all HTML, javascript etc. 
 The protocol for the API is JSON RPC 2.0 through HTTP posts.
 You can define virtual file system roots to make certain parts of the file system accessible.  
 
-## Dependencies
+# Dependencies
 The only dependency required to build the application is the go framework https://golang.org/
 
-## Configuration 
+# Building the application
+ 1. Install, (if not already installed), the go framework https://golang.org/dl/
+ 2. run `go build` in the source directory
+ 3. (optional) rename the main binary to filecommander (or main.exe to filecommander if on windows)
+
+# Configuration
 Before you can utilize the file commander, you have to define your (virtual) file system roots.
  
 
-## Protocol
+# Protocol
 
-### JSON RPC 2.0
+## JSON RPC 2.0
 For complete specification of the JSON RPC protocol, please visit http://www.jsonrpc.org/specification
 
-### List roots (df)
+## Copy (cp)
+Copy a file to an other file
+
+Example of command:
+```
+{
+  "jsonrpc":"2.0",
+  "method": "cp",
+  "params": ["private/animals/cat.jpg", "public/animals/cat.jpg"],
+  "id": "3"
+}
+```
+Example of successful response:
+```
+{
+    "jsonrpc":"2.0",
+    "result":null,
+    "id":"3"
+}
+```
+Example of unsuccessful response:
+```
+{
+    "jsonrpc":"2.0",
+    "id":"3",
+    "error":
+    {
+        "code":-32603,
+        "message":"open /temp/animals/cat.jpg: The system cannot find the file specified."
+    }
+}
+```
+
+## List roots (df)
 Lists available (virtual) file system roots by name  
 
 Example of command:
@@ -47,15 +85,35 @@ Example of successful response:
     "id":"3"
 }
 ```
-### Copy (cp)
-Copy a file to an other file
-    
+## List files (ls)
+Lists all files and directories for a certain path
+
 Example of command:
 ```
-{ 
+{
   "jsonrpc":"2.0",
-  "method": "cp",
-  "params": ["private/animals/cat.jpg", "public/animals/cat.jpg"],
+  "method": "ls",
+  "params": ["incoming/public"],
+  "id": "3"
+}
+```
+Example of successful response:
+Note: Type d: Directory, Type f: File
+```
+{
+    "jsonrpc":"2.0",
+    "result":[{"Type":"d","Name":"dir1"},{"Type":"f","Name":"file1.txt"},{"Type":"f","Name":"file2.txt"}]
+}
+```
+## Make directory (mkdir)
+Creates a directory
+
+Example of command:
+```
+{
+  "jsonrpc":"2.0",
+  "method": "mkdir",
+  "params": ["incoming/animals", "cats"],
   "id": "3"
 }
 ```
@@ -67,37 +125,13 @@ Example of successful response:
     "id":"3"
 }
 ```
-Example of unsuccessful response:
-``` 
+## Move (mv)
+Moves/renames a file or directory
+Note. A file cannot be moved between two phycically different drives
+
+Example of command:
+```
 {
-    "jsonrpc":"2.0",
-    "id":"3",
-    "error":
-    {
-        "code":-32603,
-        "message":"open /temp/animals/cat.jpg: The system cannot find the file specified."
-    }
-}
-```
-### Delete (rm)
-Deletes a file  
-
-Example of command:
-```
-{ 
-  "jsonrpc":"2.0",
-  "method": "rm",
-  "params": ["incoming/public/dog.jpg"],
-  "id": "3"
-}
-```
-### Move (mv)
-Moves/renames a file or directory  
-Note. A file cannot be moved between two phycically different drives  
-
-Example of command:
-```
-{ 
   "jsonrpc":"2.0",
   "method": "mv",
   "params": ["incoming/public/dog.jpg", "public/animals/dog.jpg"],
@@ -112,22 +146,49 @@ Example of successful response:
     "id":"3"
 }
 ```
-### List files (ls)
-Lists all files and directories for a certain path  
+## Delete (rm)
+Deletes a file  
 
 Example of command:
 ```
 { 
   "jsonrpc":"2.0",
-  "method": "ls",
-  "params": ["incoming/public"],
+  "method": "rm",
+  "params": ["incoming/public/dog.jpg"],
   "id": "3"
 }
 ```
 Example of successful response:
-Note: Type d: Directory, Type f: File 
 ```
 {
     "jsonrpc":"2.0",
-    "result":[{"Type":"d","Name":"dir1"},{"Type":"f","Name":"file1.txt"},{"Type":"f","Name":"file2.txt"}]
+    "result":null,
+    "id":"3"
 }
+```
+
+# Rebuild the front-end
+
+## Preparations
+ 1. Download and install nodejs from https://nodejs.org (go for the LTS release if you are unsure which version to choose)
+ 2. Install webpack `npm install webpack -g`
+ 3. Install webpack development server `npm install webpack-dev-server -g`
+ 4. Install the additional dependencies run ´npm install´ in the frontend directory
+
+## Developement
+For easier modification of the front end, webpack-development-server can be used
+to serve the html, js and css. No need for recompiling the go source code upon
+every change. The development server will proxy the api calls to the backend
+application. You just have to start the backend server once.
+
+
+ 1. Compile and start the backend application, let it listen to port 8080
+ 2. Start webpack-dev-server run `webpack-dev-server` in the frontend directory
+ 3. browse to `localhost:8000` with your favourite browser 
+ 4. _make your changes to the code_ and it will update in the browser as you save
+
+
+## Compile the front end code
+ * Run `webpack ... something something *TODO*`
+ * Run `webpack ...` to update the go giles
+ * Compile the go source with the updated front end code

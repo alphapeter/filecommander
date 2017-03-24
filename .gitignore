@@ -15,3 +15,13 @@
 
 # IDE
 .idea
+/*.sublime-workspace
+
+# Apple
+.DS_Store
+
+# Node
+**/node_modules
+
+# webpack output
+/frontend/bundle.js
