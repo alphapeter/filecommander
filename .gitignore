@@ -24,4 +24,4 @@
 **/node_modules
 
 # webpack output
-/frontend/bundle.js
+/frontend/build

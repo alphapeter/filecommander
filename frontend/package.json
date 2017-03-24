@@ -4,6 +4,8 @@
   "description": "Webpack build for the frontend",
   "main": "entry.js",
   "scripts": {
+    "start": "webpack-dev-server -d",
+    "build": "webpack -p && node embedjavascript.js && node embedhtml.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

@@ -173,7 +173,7 @@ Example of successful response:
  1. Download and install nodejs from https://nodejs.org (go for the LTS release if you are unsure which version to choose)
  2. Install webpack `npm install webpack -g`
  3. Install webpack development server `npm install webpack-dev-server -g`
- 4. Install the additional dependencies run ´npm install´ in the frontend directory
+ 4. Install the additional dependencies run `npm install` in the frontend directory
 
 ## Developement
 For easier modification of the front end, webpack-development-server can be used
@@ -183,12 +183,12 @@ application. You just have to start the backend server once.
 
 
  1. Compile and start the backend application, let it listen to port 8080
- 2. Start webpack-dev-server run `webpack-dev-server` in the frontend directory
- 3. browse to `localhost:8000` with your favourite browser 
+ 2. Start webpack-dev-server run `npm start` in the frontend directory
+ 3. browse to `localhost:8000` with your favourite browser
  4. _make your changes to the code_ and it will update in the browser as you save
+ 5. press `ctrl + c` to stop the dev server
 
 
 ## Compile the front end code
- * Run `webpack ... something something *TODO*`
- * Run `webpack ...` to update the go giles
+ * Run `npm run build` to run webpack en embed the content into go
  * Compile the go source with the updated front end code
