@@ -5,7 +5,15 @@ import (
 	"os"
 )
 
-func Copy(source string, destination string) error {
+
+func (command Command) Copy() error{
+	if err := command.validateBinaryParameters(); err != nil{
+		return err
+	}
+	return copy(command.Params[0], command.Params[1])
+}
+
+func copy(source string, destination string) error {
 	sourcePath, err := getPath(source)
 
 	if err != nil {

@@ -22,7 +22,6 @@ func main() {
 	http.HandleFunc("/styles.css", func(w http.ResponseWriter, r *http.Request) {
 		w.Write(gui.Css)
 
-
 	})
 	http.HandleFunc("/bundle.js", func(w http.ResponseWriter, r *http.Request) {
 		w.Write(gui.Javascript)
@@ -56,22 +55,22 @@ func main() {
 		var err error
 		switch command.Method {
 		case "mv":
-			err = commands.Move(command.Params[0], command.Params[1])
+			err = command.Move()
 			break
 		case "cp":
-			err = commands.Copy(command.Params[0], command.Params[1])
+			err = command.Copy()
 			break
 		case "rm":
-			err = commands.Delete(command.Params[0])
+			err = command.Delete()
 			break
 		case "ls":
-			response.Result, err = commands.Ls(command.Params[0])
+			response.Result, err = command.Ls()
 			break
 		case "df":
-			response.Result, err = commands.Df()
+			response.Result, err = command.Df()
 			break
 		case "mkdir":
-			err = commands.Mkdir(command.Params[0], command.Params[1])
+			err = command.Mkdir()
 			break
 		default:
 			methodNotFound(command, &w)
@@ -95,7 +94,7 @@ func main() {
 
 	})
 
-	err := http.ListenAndServe("0.0.0.0:8080", nil)
+	err := http.ListenAndServe("0.0.0.0:8000", nil)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

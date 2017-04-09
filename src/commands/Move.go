@@ -5,7 +5,14 @@ import (
 	"os"
 )
 
-func Move(source string, destination string) error {
+func (command Command) Move() error{
+	if err := command.validateBinaryParameters(); err != nil{
+		return err
+	}
+	return move(command.Params[0], command.Params[1])
+}
+
+func move(source string, destination string) error {
 	sourcePath, err := getPath(source)
 
 	if err != nil {

@@ -14,7 +14,10 @@ var settings *Settings = nil
 func GetSettings() Settings {
 	if settings == nil {
 		settings = &Settings{
-			Roots: []Root{Root{Name: "incoming", Path: "c:/incoming"}, Root{Name: "temp", Path: "c:/temp"}},
+			Roots: []Root{
+				Root{Name: "incoming", Path: "c:/incoming"},
+				Root{Name: "temp", Path: "c:/temp"},
+				Root{Name: "download", Path: "d:/download"}},
 		}
 	}
 	return *settings
