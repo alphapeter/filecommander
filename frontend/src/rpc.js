@@ -6,6 +6,7 @@ export const Rpc = {
   },
   call (method, params) {
     return fetch('api', {
+      credentials: 'include',
       method: 'POST',
       body: JSON.stringify({
         'jsonrpc': '2.0',

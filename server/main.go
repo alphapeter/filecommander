@@ -52,7 +52,6 @@ func main() {
 		}
 
 		defer r.Body.Close()
-		fmt.Print(command)
 		response := Response{Id: command.Id, RpcVersion: "2.0"}
 
 		var err error

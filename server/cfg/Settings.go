@@ -15,9 +15,10 @@ func GetSettings() Settings {
 	if settings == nil {
 		settings = &Settings{
 			Roots: []Root{
-				Root{Name: "incoming", Path: "c:/incoming"},
-				Root{Name: "temp", Path: "c:/temp"},
-				Root{Name: "download", Path: "d:/download"}},
+				Root{Name: "incoming", Path: "/mnt/nas/Incoming"},
+				Root{Name: "movies", Path: "/mnt/nas/Movies"},
+				Root{Name: "series", Path: "/mnt/nas/Series"},
+				Root{Name: "music", Path: "/mnt/nas/Music"}},
 		}
 	}
 	return *settings
