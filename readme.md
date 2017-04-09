@@ -1,20 +1,16 @@
-# Work in progress
-
-**TODO**
-* HTML interface
-* Configuration
-* document build steps
-
-# swfc
+# file commander
  
 *Simple Web File Commander*
 
 # About
-A simple web file commander implemented in the Go language. 
+A simple, portable web file commander implemented in the Go language. 
 It compiles into one single binary which bundles all HTML, javascript etc. 
 The protocol for the API is JSON RPC 2.0 through HTTP posts.
 You can define virtual file system roots to make certain parts of the file system accessible.  
 
+
+# Compatibility
+The front end will only run on modern browsers, such as chrome, firefox, opera or edge, **internet explorer will not work**
 # Dependencies
 The only dependency required to build the application is the go framework https://golang.org/
 
@@ -176,19 +172,26 @@ Example of successful response:
  4. Install the additional dependencies run `npm install` in the frontend directory
 
 ## Developement
-For easier modification of the front end, webpack-development-server can be used
-to serve the html, js and css. No need for recompiling the go source code upon
-every change. The development server will proxy the api calls to the backend
-application. You just have to start the backend server once.
-
+The front end is written using vue.js, vuex and webpack. There's no need to recompile the backend during development. 
+The webpack development server will proxy the api calls to the backend once it is started.  
+  
 
  1. Compile and start the backend application, let it listen to port 8080
- 2. Start webpack-dev-server run `npm start` in the frontend directory
- 3. browse to `localhost:8000` with your favourite browser
+ 2. Start webpack-dev-server run `npm run dev` in the frontend directory
+ 3. browse to `localhost:8080` with your favourite browser
  4. _make your changes to the code_ and it will update in the browser as you save
- 5. press `ctrl + c` to stop the dev server
-
+ 5. press `ctrl + c` to stop the dev server  
 
 ## Compile the front end code
  * Run `npm run build` to run webpack en embed the content into go
  * Compile the go source with the updated front end code
+ 
+# Work in progress (whats next)
+ **TODO**
+ * Configuration
+ * document build steps
+ * implement key navigation
+ * implement multiselect using shift
+ * implement demo 
+ * make precompile binaries available
+ * code cleanup

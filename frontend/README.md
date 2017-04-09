@@ -1,4 +1,4 @@
-# frontend
+# file commander frontend
 
 > A Vue.js project
 
