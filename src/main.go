@@ -12,6 +12,7 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
+			w.Header().Set("Content-Type", "text/html")
 			w.Write(gui.Html)
 			break
 		default:
@@ -19,11 +20,13 @@ func main() {
 			w.Write([]byte("bad request"))
 		}
 	})
-	http.HandleFunc("/styles.css", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/static/css/app.css", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/css")
 		w.Write(gui.Css)
 
 	})
-	http.HandleFunc("/bundle.js", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/static/js/app.js", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		w.Write(gui.Javascript)
 	})
 
@@ -90,6 +93,7 @@ func main() {
 			return
 		}
 		a, _ := json.Marshal(response)
+		w.Header().Set("Content-Type", "application/json")
 		w.Write(a)
 
 	})

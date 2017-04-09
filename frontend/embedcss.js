@@ -1,8 +1,8 @@
 var embed = require('./embedingo.js');
 
 var package = "gui";
-var property = "Html";
-var destinationFileName = "../src/gui/Html.go";
-var sourceFileName = "./dist/index.html";
+var property = "Css";
+var destinationFileName = "../src/gui/CssBundle.go";
+var sourceFileName = "./dist/static/css/app.css";
 
 embed.run(package, property, destinationFileName, sourceFileName);

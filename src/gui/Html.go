@@ -1,22 +1,3 @@
 package gui
 
-var Html = []byte(`<html>
-<head>
-    <title>
-        Filecommander
-    </title>
-    <script src="bundle.js"></script>
-</head>
-<body>
-<div id="directory1" class="filebrowser left"></div>
-<div id="directory2" class="filebrowser right"></div>
-
-<div class="commands">
-    <button id="copy" class="icon-clone">copy</button>
-    <button id="move" class="icon-exchange">move</button>
-    <button id="mkdir" class="icon-folder-empty-1">mkdir</button>
-    <button id="delete" class="icon-trash-empty">delete</button>
-    <button id="rename" class="icon-pencil-squared">rename</button>
-</div>
-</body>
-</html>`)
+var Html = []byte(`<!DOCTYPE html><html><head><meta charset=utf-8><title>File commander</title><link href=/static/css/app.css rel=stylesheet></head><body><div id=app></div><script type=text/javascript src=/static/js/app.js></script></body></html>`)
