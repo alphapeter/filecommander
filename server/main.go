@@ -6,9 +6,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"./cfg"
 )
 
 func main() {
+	settings := cfg.GetSettings()
+
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
@@ -97,7 +101,7 @@ func main() {
 
 	})
 
-	err := http.ListenAndServe("0.0.0.0:8000", nil)
+	err := http.ListenAndServe(settings.Binding, nil)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

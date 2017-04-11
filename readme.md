@@ -21,7 +21,48 @@ The only dependency required to build the application is the go framework https:
 
 # Configuration
 Before you can utilize the file commander, you have to define your (virtual) file system roots.
+example of `settings.json`
+ ```
+ {
+   "roots": [
+     {
+       "name": "temp",
+       "path": "/tmp"
+     },
+     {
+       "name": "incoming",
+       "path": "/var/incoming"
+     }
+   ],
+   "binding": "0.0.0.0:8080"
+ }
  
+```
+
+example of `settings.json` for windows
+ ```
+ {
+   "roots": [
+     {
+       "name": "temp",
+       "path": "c:/temp"
+     },
+     {
+       "name": "incoming",
+       "path": "c:/incoming"
+     }
+   ],
+   "binding": "0.0.0.0:8080"
+ }
+ 
+```
+
+if binding is specified as  `0.0.0.0:8080` it will listen to all addresses  
+if binding is specified as `192.168.0.100:80` it will listen to 192.168.0.100 at port 80
+
+**file location**  
+* the default search path is './settings.json'  
+* to load settings file from another location, use the argument `--settings <path-to-settings>/<filename>.json` when starting the application  
 
 # Protocol
 

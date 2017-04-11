@@ -6,9 +6,13 @@
     </div >
     <commands></commands>
     <wait-dialog v-if="$store.state.uiState === 'initializing'">loading...</wait-dialog>
-    <wait-dialog v-if="$store.state.uiState === 'copy-wait'">copying files</wait-dialog>
     <wait-dialog v-if="$store.state.uiState === 'rename-wait'">renaming file</wait-dialog>
     <wait-dialog v-if="$store.state.uiState === 'mkdir-wait'">creating new directory</wait-dialog>
+
+    <progress-dialog v-if="$store.state.uiState === 'copy-wait'">copying files...</progress-dialog>
+    <progress-dialog v-if="$store.state.uiState === 'move-wait'">moving files...</progress-dialog>
+    <progress-dialog v-if="$store.state.uiState === 'delete-file-wait'">deleting files...</progress-dialog>
+
     <rename-dialog v-if="$store.state.uiState === 'rename'">renaming file</rename-dialog>
     <mkdir-dialog v-if="$store.state.uiState === 'mkdir'"></mkdir-dialog>
     <error-dialog v-if="$store.state.uiState === 'error'"></error-dialog>
@@ -25,6 +29,7 @@
   import MkdirDialog from './components/Dialogs/MkdirDialog.vue'
   import ErrorDialog from './components/Dialogs/ErrorDialog.vue'
   import DeleteDialog from './components/Dialogs/DeleteDialog.vue'
+  import ProgressDialog from './components/Dialogs/ProgressDialog.vue'
 
   export default {
     name: 'app',
@@ -36,7 +41,8 @@
       RenameDialog,
       MkdirDialog,
       DeleteDialog,
-      ErrorDialog
+      ErrorDialog,
+      ProgressDialog
     },
     data () {
       return {
