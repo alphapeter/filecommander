@@ -8,6 +8,8 @@ It compiles into one single binary which bundles all HTML, javascript etc.
 The protocol for the API is JSON RPC 2.0 through HTTP posts.
 You can define virtual file system roots to make certain parts of the file system accessible.  
 
+# Download
+https://github.com/alphapeter/filecommander/releases
 
 # Compatibility
 The front end will only run on modern browsers, such as chrome, firefox, opera or edge, **internet explorer will not work**
