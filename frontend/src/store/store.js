@@ -26,7 +26,6 @@ const actions = {
   init: function ({commit}) {
     Rpc.getRoots()
       .then((response) => {
-        console.log(response)
         commit('init', response.result)
       })
   }
@@ -98,6 +97,12 @@ export const store = new Vuex.Store({
       } else {
         selectedFiles.splice(fileIndex, 1)
       }
+    },
+    selectFiles (state, message) {
+      if (state.selectedState !== message.stateId) {
+        state.states[state.selectedState].selectedFiles = []
+      }
+      state.states[message.stateId].selectedFiles = message.value
     },
     selectView (state, viewId) {
       if (state.selectedState !== viewId) {

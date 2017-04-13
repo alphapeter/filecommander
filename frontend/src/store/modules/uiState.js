@@ -1,3 +1,4 @@
+import { EventBus } from '../../EventBus.js'
 const state = {
   state: 'initializing',
   error: null,
@@ -39,6 +40,7 @@ const mutations = {
   },
   commandFinished (state) {
     state.state = 'browse'
+    EventBus.$emit('commandFinished')
   },
   commandCanceled (state) {
     state.state = 'browse'

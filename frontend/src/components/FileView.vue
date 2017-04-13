@@ -12,11 +12,11 @@
            class="file"
            @dblclick="changePathToParent">..
       </div>
-      <file v-for="file in files"
+      <file v-for="(file, index) in files"
             :file="file"
             :class="{'selected': selected(file)}"
             :key="file.name"
-            @click.native="selectFile(file, $event)"
+            @click.native="selectFile(file, index, $event)"
             @dblclick.native="changePath(file)">
       </file>
     </div>
@@ -27,11 +27,14 @@
   import File from './File.vue'
   import FileHeader from './FileHeader.vue'
   import { Rpc } from '../rpc.js'
+  import { EventBus } from '../EventBus'
+
   export default{
     props: ['roots', 'id'],
     data: () => {
       return {
-        files: []
+        files: [],
+        lastSelectedIndex: ''
       }
     },
     computed: {
@@ -72,12 +75,21 @@
       selected (file) {
         return this.$store.state.states[this.id] && this.$store.state.states[this.id].selectedFiles.includes(file.name)
       },
-      selectFile (file, event) {
-        if (event.ctrlKey) {
+      selectFile (file, index, event) {
+        if (event.shiftKey) {
+          let begin = Math.min(this.lastSelectedIndex, index)
+          let end = Math.max(this.lastSelectedIndex, index) + 1
+          let selectedFiles = this.files
+            .slice(begin, end)
+            .map(file => file.name)
+          this.$store.commit('selectFiles', {stateId: this.id, value: selectedFiles})
+          return
+        } else if (event.ctrlKey) {
           this.$store.commit('selectFile', {stateId: this.id, value: file.name})
         } else {
           this.$store.commit('selectSingleFile', {stateId: this.id, value: file.name})
         }
+        this.lastSelectedIndex = index
       },
       selectRoot (e) {
         this.$store.commit('selectRoot', {stateId: this.id, value: e.target.value})
@@ -108,6 +120,11 @@
             vm.files = files
           })
       }
+    },
+    created () {
+      EventBus.$on('commandFinished', () => {
+        this.reloadFiles()
+      })
     }
   }
 </script>
