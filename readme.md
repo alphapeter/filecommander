@@ -229,10 +229,7 @@ The webpack development server will proxy the api calls to the backend once it i
  
 # Work in progress (whats next)
  **TODO**
- * Configuration
- * document build steps
  * implement key navigation
- * implement multiselect using shift
  * implement demo 
  * make precompile binaries available
  * code cleanup
