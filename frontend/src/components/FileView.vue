@@ -1,26 +1,25 @@
 <template>
   <div class="fileview" :class="{selected: isSelected}">
-    <template v-if="isInitialized">
-      <span v-for="(p, i) in path"
-            @click="setPath(i)"
-            class="path">/{{p}}</span>
-      <select class="rootSelector" @change="selectRoot" :value="selectedRoot">
-        <option v-for="root in roots">{{root}}</option>
-      </select>
-      <file-header></file-header>
-      <div class="fileContainer">
-        <div v-if="path.length > 1"
-             class="file"
-             @dblclick="changePathToParent">..</div>
-        <file v-for="file in files"
-              :file="file"
-              :class="{'selected': selected(file)}"
-              :key="file.name"
-              @click.native="selectFile(file, $event)"
-              @dblclick.native="changePath(file)">
-        </file>
+    <span v-for="(p, i) in path"
+          @click="setPath(i)"
+          class="path">/{{p}}</span>
+    <select class="rootSelector" @change="selectRoot" :value="selectedRoot">
+      <option v-for="root in roots">{{root}}</option>
+    </select>
+    <file-header></file-header>
+    <div class="fileContainer">
+      <div v-if="path.length > 1"
+           class="file"
+           @dblclick="changePathToParent">..
       </div>
-    </template>
+      <file v-for="file in files"
+            :file="file"
+            :class="{'selected': selected(file)}"
+            :key="file.name"
+            @click.native="selectFile(file, $event)"
+            @dblclick.native="changePath(file)">
+      </file>
+    </div>
   </div>
 </template>
 
@@ -43,21 +42,18 @@
         return this.$store.state.roots
       },
       selectedRoot () {
-        return this.isInitialized && this.$store.state.states[this.id].selectedRoot
+        return this.$store.state.states[this.id].selectedRoot
       },
       isSelected () {
         return this.$store.state.selectedState === this.id
       },
       path () {
-        return this.isInitialized && [this.selectedRoot].concat(this.$store.state.states[this.id].path)
+        return [this.selectedRoot].concat(this.$store.state.states[this.id].path)
       },
       pathString () {
-        return this.isInitialized && this.$store.state.states[this.id].path.reduce((acc, p) => {
+        return this.$store.state.states[this.id].path.reduce((acc, p) => {
           return acc + '/' + p
         }, '')
-      },
-      isInitialized () {
-        return this.$store.state.uiState !== 'initializing'
       }
     },
     components: {
@@ -117,7 +113,7 @@
 </script>
 
 <style>
-  .fileview{
+  .fileview {
     width: calc(50% - 30px);
     height: 100%;
     border: 2px solid blue;
@@ -130,22 +126,20 @@
     user-select: none;
   }
 
-  .fileview.selected{
+  .fileview.selected {
     border-color: white;
   }
 
-  .rootSelector{
+  .rootSelector {
     float: right;
   }
-  .path{
 
-  }
-  .path:hover{
+  .path:hover {
     cursor: pointer;
     text-decoration: underline;
   }
 
-  .fileHeader{
+  .fileHeader {
     cursor: default;
     position: relative;
     width: 100%;
@@ -153,27 +147,30 @@
     margin-bottom: 5px;
     border-bottom: 1px solid cyan;
   }
-  .fileContainer{
+
+  .fileContainer {
     width: 100%;
     overflow-y: auto;
     overflow-x: hidden;
     height: calc(100% - 2em - 12px);
   }
 
-  .file{
+  .file {
     cursor: default;
     position: relative;
     width: 100%;
   }
 
-  .file:hover{
+  .file:hover {
     background: gray;
   }
-  .file.selected{
+
+  .file.selected {
     background: yellow;
     color: blue;
   }
-  .fileName{
+
+  .fileName {
     display: inline-block;
     overflow-x: hidden;
     word-break: break-all;
@@ -182,7 +179,8 @@
     margin: 0;
     white-space: nowrap;
   }
-  .fileSize{
+
+  .fileSize {
     display: inline-block;
     overflow-x: hidden;
     width: calc(12% - 2px);
@@ -191,7 +189,8 @@
     float: right;
     white-space: nowrap;
   }
-  .fileModified{
+
+  .fileModified {
     display: inline-block;
     overflow-x: hidden;
     width: calc(33% - 2px);

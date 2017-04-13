@@ -25,21 +25,32 @@
       deleteFile () {
         this.$store.commit('deleteFileWait')
         let currentState = this.$store.getters.currentState
-        let path = this.$store.getters.currentPathString
+        let path = currentState.selectedRoot + this.$store.getters.currentPathString
         let vm = this
+        vm.$store.commit('startProgress', {
+          max: currentState.selectedFiles.length
+        })
+        let fileIndex = 0
+
         function del (index) {
-          Rpc.call('rm', [currentState.selectedRoot + path + '/' + currentState.selectedFiles[index]])
+          let fileName = currentState.selectedFiles.splice(0, 1)
+          vm.$store.commit('progress', {
+            message: fileName,
+            progress: fileIndex
+          })
+          Rpc.call('rm', [path + '/' + fileName])
             .then(response => {
               if (response.error) {
                 vm.$store.commit('error', response.error)
-              } else if (index >= currentState.selectedFiles.length - 1) {
+              } else if (currentState.selectedFiles.length === 0) {
                 vm.$store.commit('commandFinished')
               } else {
-                del(index + 1)
+                fileIndex++
+                del()
               }
             })
         }
-        del(0)
+        del()
       }
     },
     created () {

@@ -23,7 +23,7 @@
     props: ['disableButtons'],
     methods: {
       cancel () {
-        this.$store.commit('browse')
+        this.$store.commit('commandCanceled')
       }
     },
     created () {
@@ -35,7 +35,7 @@
       this.eventListener = (e) => {
         console.log(e)
         if (e.key === 'Escape') {
-          vm.$store.commit('browse')
+          vm.cancel()
         }
       }
       window.addEventListener('keyup', this.eventListener)

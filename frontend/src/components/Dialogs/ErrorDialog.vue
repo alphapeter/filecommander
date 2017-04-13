@@ -1,7 +1,7 @@
 <template>
   <Modal>
     <div class="message">
-      {{$store.state.error.message}} ({{$store.state.error.code}})
+      {{$store.state.ui.error.message}} ({{$store.state.ui.error.code}})
     </div>
   </Modal>
 </template>

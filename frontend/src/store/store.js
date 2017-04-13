@@ -1,23 +1,25 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {Rpc} from './rpc.js'
+import { Rpc } from '../rpc.js'
+import ui from './modules/uiState'
 
 Vue.use(Vuex)
 
-function createState () {
-  return {
-    selectedRoot: '',
-    selectedFiles: [],
-    path: [],
-    loading: true
-  }
-};
-
 const state = {
-  selectedState: '0',
+  selectedState: 'left',
   roots: [],
-  states: [],
-  uiState: 'initializing'
+  states: {
+    left: {
+      selectedRoot: '',
+      selectedFiles: [],
+      path: []
+    },
+    right: {
+      selectedRoot: '',
+      selectedFiles: [],
+      path: []
+    }
+  }
 }
 
 const actions = {
@@ -31,9 +33,9 @@ const actions = {
 }
 
 const otherStateId = (id) => {
-  return id === '0'
-    ? '1'
-    : '0'
+  return id === 'left'
+    ? 'right'
+    : 'left'
 }
 
 const getPathString = path => {
@@ -63,13 +65,12 @@ export const store = new Vuex.Store({
   getters: getters,
   mutations: {
     init (state, roots) {
-      state.states = [createState(), createState()]
       state.roots = roots
-      state.uiState = 'browse'
+      state.ui.state = 'browse'
       state.loading = false
       if (roots.length > 0) {
-        state.states[0].selectedRoot = state.roots[0]
-        state.states[1].selectedRoot = roots.length > 1
+        state.states['left'].selectedRoot = state.roots[0]
+        state.states['right'].selectedRoot = roots.length > 1
           ? state.roots[1]
           : state.roots[0]
       }
@@ -118,42 +119,10 @@ export const store = new Vuex.Store({
       let viewState = state.states[message.stateId]
       viewState.selectedFiles = []
       viewState.path.splice(message.value, viewState.path.length)
-    },
-    rename (state) {
-      state.uiState = 'rename'
-    },
-    renameWait (state) {
-      state.uiState = 'rename-wait'
-    },
-    mkdir (state) {
-      state.uiState = 'mkdir'
-    },
-    mkdirWait (state) {
-      state.uiState = 'mkdir-wait'
-    },
-    copyWait (state) {
-      state.uiState = 'copy-wait'
-    },
-    moveWait (state) {
-      state.uiState = 'move-wait'
-    },
-    deleteFile (state) {
-      state.uiState = 'delete-file'
-    },
-    deleteFileWait (state) {
-      state.uiState = 'delete-file-wait'
-    },
-    browse (state) {
-      state.uiState = 'browse'
-    },
-    error (state, error) {
-      state.uiState = 'error'
-      state.error = error
-    },
-    commandFinished (state) {
-      state.uiState = 'browse'
-      state.states[state.selectedState].selectedFiles = []
     }
   },
-  actions: actions
+  actions: actions,
+  modules: {
+    ui
+  }
 })

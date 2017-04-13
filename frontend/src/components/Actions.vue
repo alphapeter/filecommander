@@ -22,7 +22,7 @@
             class="icon-exchange"
             :disabled="buttonsDisabled"
             @click="move"
-            v-text="'Move (O)'">
+            v-text="'Move (M)'">
     </button>
     <button id="delete"
             class="icon-trash-empty"
@@ -81,32 +81,42 @@
       },
       executeBinaryCommand (command) {
         let currentState = this.$store.getters.currentState
-        let currentPath = this.$store.getters.currentPathString
+        let currentPath = currentState.selectedRoot + '/' + this.$store.getters.currentPathString
         let otherState = this.$store.getters.otherState
-        let otherPath = this.$store.getters.otherPathString
+        let otherPath = otherState.selectedRoot + '/' + this.$store.getters.otherPathString
 
         let vm = this
+        vm.$store.commit('startProgress', {
+          max: currentState.selectedFiles.length
+        })
+        let fileIndex = 0
+
         function run (index) {
-          Rpc.call(command,
-            [currentState.selectedRoot + currentPath + '/' + currentState.selectedFiles[index],
-              otherState.selectedRoot + otherPath + '/' + currentState.selectedFiles[index]])
+          let fileName = currentState.selectedFiles.splice(0, 1)[0]
+          vm.$store.commit('progress', {
+            message: fileName,
+            progress: fileIndex
+          })
+          Rpc.call(command, [currentPath + '/' + fileName, otherPath + '/' + fileName])
             .then(response => {
               if (response.error) {
                 vm.$store.commit('error', response.error)
-              } else if (index >= currentState.selectedFiles.length - 1) {
+              } else if (currentState.selectedFiles.length === 0) {
                 vm.$store.commit('commandFinished')
               } else {
-                run(index + 1)
+                fileIndex++
+                run()
               }
             })
         }
-        run(0)
+
+        run()
       }
     },
     created () {
       let vm = this
       this.eventListener = (e) => {
-        if (vm.$store.state.uiState !== 'browse') {
+        if (vm.$store.state.ui.state !== 'browse') {
           return
         }
         switch (e.key) {
@@ -146,7 +156,7 @@
 </script>
 
 <style>
-  .commands{
+  .commands {
     clear: both;
   }
 </style>

@@ -2,7 +2,7 @@ require('./assets/css/font-icons.css')
 require('./assets/css/main.css')
 import Vue from 'vue'
 import App from './App'
-import {store} from './store'
+import {store} from './store/store'
 
 Vue.config.productionTip = false
 
