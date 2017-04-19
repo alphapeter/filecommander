@@ -1,5 +1,5 @@
 <template>
-  <div class="commands">
+  <div class="actions">
     <button id="rename"
             class="icon-pencil-squared"
             :disabled="buttonsDisabled || multipleFilesSelected"
@@ -156,7 +156,8 @@
 </script>
 
 <style>
-  .commands {
+  .actions {
     clear: both;
+    width: 100%; text-align: center;
   }
 </style>

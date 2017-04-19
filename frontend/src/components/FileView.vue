@@ -3,9 +3,11 @@
     <span v-for="(p, i) in path"
           @click="setPath(i)"
           class="path">/{{p}}</span>
-    <select class="rootSelector" @change="selectRoot" :value="selectedRoot">
+    <select class="rootSelector" @change="selectRoot" :value="selectedRoot" title="choose server root">
       <option v-for="root in roots">{{root}}</option>
     </select>
+    <div class="reload-files" role="button" @click="reloadFiles" title="update files from server">
+      <i :class="{'icon-arrows-cw': !loading, 'icon-spin4': loading, 'animate-spin': loading}"></i></div>
     <file-header></file-header>
     <div class="fileContainer">
       <div v-if="path.length > 1"
@@ -34,7 +36,8 @@
     data: () => {
       return {
         files: [],
-        lastSelectedIndex: ''
+        lastSelectedIndex: '',
+        loading: false
       }
     },
     computed: {
@@ -108,6 +111,10 @@
       },
       reloadFiles () {
         let vm = this
+        if (this.loading) {
+          return
+        }
+        this.loading = true
         Rpc.call('ls', [this.selectedRoot + this.pathString])
           .then((response) => {
             let files = response.result.filter((file) => {
@@ -117,6 +124,7 @@
                 return file.type === 'f'
               })
             )
+            vm.loading = false
             vm.files = files
           })
       }
@@ -145,6 +153,15 @@
 
   .fileview.selected {
     border-color: white;
+  }
+
+  .reload-files {
+    float: right;
+    cursor: pointer;
+  }
+
+  .reload-files:hover {
+    color: white;
   }
 
   .rootSelector {
@@ -216,5 +233,16 @@
     float: right;
     overflow-y: hidden;
     white-space: nowrap;
+  }
+
+  .animate-spin {
+    animation-name: spin;
+    animation-duration: 2s;
+    animation-timing-function: linear;
+    animation-delay: initial;
+    animation-iteration-count: 3;
+    animation-direction: initial;
+    animation-fill-mode: initial;
+    animation-play-state: initial;
   }
 </style>
