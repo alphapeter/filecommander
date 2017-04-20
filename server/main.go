@@ -1,12 +1,12 @@
 package main
 
 import (
-	"./commands"
-	"./gui"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"./cfg"
+	"github.com/alphapeter/filecommander/server/cfg"
+	"github.com/alphapeter/filecommander/server/commands"
+	"github.com/alphapeter/filecommander/server/gui"
 )
 
 func main() {

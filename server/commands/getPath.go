@@ -1,7 +1,7 @@
 package commands
 
 import "strings"
-import "../cfg"
+import "github.com/alphapeter/filecommander/server/cfg"
 
 func getPath(directory string) (string, error) {
 	if err := ValidatePath(directory); err != nil{

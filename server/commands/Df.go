@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"../cfg"
+	"github.com/alphapeter/filecommander/server/cfg"
 	"errors"
 )
 
