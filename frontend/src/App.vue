@@ -40,6 +40,23 @@
     },
     created () {
       this.$store.dispatch('init')
+      let vm = this
+      this.eventListener = (e) => {
+        if (vm.$store.state.ui.state !== 'browse') {
+          return
+        }
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+          vm.$store.commit('toggleView')
+          e.preventDefault()
+        }
+      }
+      window.addEventListener('keydown', this.eventListener)
+    },
+    destroyed () {
+      if (this.disableButtons) {
+        return
+      }
+      window.removeEventListener('keydown', this.eventListener)
     }
   }
 </script>

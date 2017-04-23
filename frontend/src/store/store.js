@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { Rpc } from '../rpc.js'
+import {Rpc} from '../rpc.js'
 import ui from './modules/uiState'
 
 Vue.use(Vuex)
@@ -57,6 +57,9 @@ const getters = {
   otherPathString (state) {
     let otherState = state.states[otherStateId(state.selectedState)]
     return getPathString(otherState.path)
+  },
+  otherStateId (state) {
+    return otherStateId(state.selectedState)
   }
 }
 export const store = new Vuex.Store({
@@ -77,6 +80,7 @@ export const store = new Vuex.Store({
     selectRoot (state, message) {
       var viewState = state.states[message.stateId]
       viewState.selectedRoot = message.value
+      viewState.selectedFiles = []
       viewState.path = []
     },
     selectSingleFile (state, message) {
@@ -109,6 +113,9 @@ export const store = new Vuex.Store({
         state.states[state.selectedState].selectedFiles = []
       }
       state.selectedState = viewId
+    },
+    toggleView (state) {
+      state.selectedState = otherStateId(state.selectedState)
     },
     changePath (state, message) {
       let viewState = state.states[message.stateId]
