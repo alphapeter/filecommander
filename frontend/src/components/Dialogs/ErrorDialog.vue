@@ -16,13 +16,13 @@
 </script>
 
 <style scoped>
-  .message{
+  .message {
     margin-top: 1em;
-    top: calc(50% - 2em/2);
+    top: calc(50% - 2em / 2);
     color: red;
+    background-color: lightgray;
   }
   button {
-
   : relative;
     bottom: 1em;
   }

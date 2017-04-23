@@ -33,7 +33,6 @@
 
       let vm = this
       this.eventListener = (e) => {
-        console.log(e)
         if (e.key === 'Escape') {
           vm.cancel()
         }
@@ -50,7 +49,7 @@
 </script>
 
 <style scoped>
-  .overlay{
+  .overlay {
     position: absolute;
     left: 0;
     top: 0;
@@ -58,26 +57,30 @@
     height: 100%;
   }
 
-  .dialog{
+  .dialog {
     position: fixed;
     top: calc(50% - 10em / 2);
     left: calc(50% - 40em / 2);
     border: 6px double white;
     width: 40em;
     height: 6em;
-    background-color: lightgray;
+    background-color: gray;
     margin-left: auto;
     margin-right: auto;
     text-align: center;
+    color: white;
+    padding: 1em;
   }
+
   .buttons {
     position: absolute;
-    width: 100%;
-    bottom: 5px;
+    width: calc(100% - 2em);
+    bottom: 1em;
     margin: auto;
     text-align: center;
   }
-  input{
+
+  input {
     position: relative;
     top: 1em;
     background-color: white;
