@@ -3,10 +3,16 @@
     <span v-for="(p, i) in path"
           @click="setPath(i)"
           class="path">/{{p}}</span>
-    <select class="rootSelector" @change="selectRootFn" :value="selectedRoot" title="choose server root">
+    <select class="rootSelector"
+            @change="selectRootFn"
+            :value="selectedRoot"
+            title="choose server root">
       <option v-for="root in roots">{{root}}</option>
     </select>
-    <div class="reload-files" role="button" @click="reloadFiles" title="update files from server">
+    <div class="reload-files"
+         role="button"
+         @click="reloadFiles"
+         title="update files from server">
       <i :class="{'icon-arrows-cw': !loading, 'icon-spin4': loading, 'animate-spin': loading}"></i></div>
     <file-header></file-header>
     <div class="fileContainer">
@@ -17,7 +23,8 @@
       </div>
       <file v-for="(file, index) in files"
             :file="file"
-            :class="{'selected': selected(file), 'focused': isFocused(file)}"
+            :selected="selected(file)"
+            :focused="isFocused(file)"
             :key="file.name"
             @click.native="selectFile(file, index, $event)"
             @dblclick.native="changePath(file)">
@@ -195,7 +202,11 @@
             break
           case 'u':
             vm.reloadFiles()
+            break
+          default:
+            return
         }
+        e.preventDefault()
       }
       window.addEventListener('keydown', this.eventListener)
     },
@@ -255,61 +266,6 @@
     overflow-y: auto;
     overflow-x: hidden;
     height: calc(100% - 2em - 12px);
-  }
-
-  .file {
-    cursor: default;
-    position: relative;
-    width: 100%;
-  }
-
-  .file:hover {
-    color: white;
-  }
-
-  .file.focused {
-    background: gray;
-  }
-
-  .file.selected {
-    background: yellow;
-    color: blue;
-  }
-
-  .file.selected.focused {
-    background: green;
-    color: blue;
-  }
-
-  .fileName {
-    display: inline-block;
-    overflow-x: hidden;
-    word-break: break-all;
-    width: calc(53% - 2px);
-    height: 1em;
-    margin: 0;
-    white-space: nowrap;
-  }
-
-  .fileSize {
-    display: inline-block;
-    overflow-x: hidden;
-    width: calc(12% - 2px);
-    height: 1em;
-    margin: 0;
-    float: right;
-    white-space: nowrap;
-  }
-
-  .fileModified {
-    display: inline-block;
-    overflow-x: hidden;
-    width: calc(33% - 2px);
-    height: 1em;
-    margin: 0;
-    float: right;
-    overflow-y: hidden;
-    white-space: nowrap;
   }
 
   .animate-spin {
