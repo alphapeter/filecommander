@@ -10,7 +10,15 @@
 </template>
 <script>
   export default{
-    props: ['file', 'selected', 'focused'],
+    props: ['file'],
+    computed: {
+      selected () {
+        return this.file.selected
+      },
+      focused () {
+        return this.file.focused
+      }
+    },
     methods: {
       size (size) {
         if (size < 1000) {

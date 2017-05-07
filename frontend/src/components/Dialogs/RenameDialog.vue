@@ -16,6 +16,7 @@
 <script>
   import Modal from './Modal.vue'
   import { Rpc } from '../../rpc'
+  import { mapGetters } from 'vuex'
   export default {
     components: {
       Modal
@@ -26,6 +27,11 @@
         oldName: '',
         keypress: null
       }
+    },
+    computed: {
+      ...mapGetters([
+        'selectedFiles'
+      ])
     },
     methods: {
       rename () {
@@ -51,8 +57,8 @@
           }
         }
       }
-      this.name = this.$store.getters.currentState.selectedFiles[0]
-      this.oldName = this.$store.getters.currentState.selectedFiles[0]
+      this.name = this.selectedFiles[0]
+      this.oldName = this.selectedFiles[0]
       window.addEventListener('keyup', this.keypress)
     },
     mounted () {

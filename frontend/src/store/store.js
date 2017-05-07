@@ -1,22 +1,22 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {Rpc} from '../rpc.js'
+import { Rpc } from '../rpc.js'
 import ui from './modules/uiState'
 
 Vue.use(Vuex)
 
 const state = {
-  selectedState: 'left',
+  activeView: 'left',
   roots: [],
-  states: {
+  views: {
     left: {
       selectedRoot: '',
-      selectedFiles: [],
+      files: [],
       path: []
     },
     right: {
       selectedRoot: '',
-      selectedFiles: [],
+      files: [],
       path: []
     }
   }
@@ -45,21 +45,35 @@ const getPathString = path => {
 
 const getters = {
   currentState (state) {
-    return state.states[state.selectedState]
+    return state.views[state.activeView]
   },
   currentPathString (state) {
-    let path = state.states[state.selectedState].path
+    let path = state.views[state.activeView].path
     return getPathString(path)
   },
   otherState (state) {
-    return state.states[otherStateId(state.selectedState)]
+    return state.views[otherStateId(state.activeView)]
   },
   otherPathString (state) {
-    let otherState = state.states[otherStateId(state.selectedState)]
+    let otherState = state.views[otherStateId(state.activeView)]
     return getPathString(otherState.path)
   },
   otherStateId (state) {
-    return otherStateId(state.selectedState)
+    return otherStateId(state.activeView)
+  },
+  selectedFiles (state) {
+    let selectedFiles = state.views[state.activeView]
+      .files
+      .filter(file => file.selected)
+      .map(file => file.name)
+
+    if (selectedFiles.length) {
+      return selectedFiles
+    }
+    var focusedFile = state.views[state.activeView]
+      .files
+      .find(file => file.focused)
+    return focusedFile ? [focusedFile.name] : []
   }
 }
 export const store = new Vuex.Store({
@@ -71,65 +85,33 @@ export const store = new Vuex.Store({
       state.ui.state = 'browse'
       state.loading = false
       if (roots.length > 0) {
-        state.states['left'].selectedRoot = state.roots[0]
-        state.states['right'].selectedRoot = roots.length > 1
+        state.views['left'].selectedRoot = state.roots[0]
+        state.views['right'].selectedRoot = roots.length > 1
           ? state.roots[1]
           : state.roots[0]
       }
     },
     selectRoot (state, message) {
-      var viewState = state.states[message.stateId]
+      var viewState = state.views[message.stateId]
       viewState.selectedRoot = message.value
-      viewState.selectedFiles = []
       viewState.path = []
     },
-    selectSingleFile (state, message) {
-      if (state.selectedState !== message.stateId) {
-        state.states[state.selectedState].selectedFiles = []
-      }
-      state.states[message.stateId].selectedFiles = [message.value]
-    },
-    selectFile (state, message) {
-      if (state.selectedState !== message.stateId) {
-        state.states[state.selectedState].selectedFiles = []
-      }
-
-      let selectedFiles = state.states[message.stateId].selectedFiles
-      let fileIndex = selectedFiles.indexOf(message.value)
-      if (fileIndex === -1) {
-        selectedFiles.push(message.value)
-      } else {
-        selectedFiles.splice(fileIndex, 1)
-      }
-    },
-    selectFiles (state, message) {
-      if (state.selectedState !== message.stateId) {
-        state.states[state.selectedState].selectedFiles = []
-      }
-      state.states[message.stateId].selectedFiles = message.value
-    },
     selectView (state, viewId) {
-      if (state.selectedState !== viewId) {
-        state.states[state.selectedState].selectedFiles = []
-      }
-      state.selectedState = viewId
+      state.activeView = viewId
     },
     toggleView (state) {
-      state.selectedState = otherStateId(state.selectedState)
+      state.activeView = otherStateId(state.activeView)
     },
     changePath (state, message) {
-      let viewState = state.states[message.stateId]
-      viewState.selectedFiles = []
+      let viewState = state.views[message.stateId]
       viewState.path.push(message.value)
     },
     changePathToParent (state, message) {
-      let viewState = state.states[message.stateId]
-      viewState.selectedFiles = []
+      let viewState = state.views[message.stateId]
       viewState.path.pop()
     },
     setPath (state, message) {
-      let viewState = state.states[message.stateId]
-      viewState.selectedFiles = []
+      let viewState = state.views[message.stateId]
       viewState.path.splice(message.value, viewState.path.length)
     }
   },

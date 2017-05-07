@@ -11,6 +11,7 @@
 <script>
   import Modal from './Modal.vue'
   import { Rpc } from '../../rpc'
+  import { mapGetters } from 'vuex'
   export default {
     components: {
       Modal
@@ -21,19 +22,26 @@
         keypress: null
       }
     },
+    computed: {
+      ...mapGetters([
+        'selectedFiles',
+        'currentPathString',
+        'currentState'
+      ])
+    },
     methods: {
       deleteFile () {
         this.$store.commit('deleteFileWait')
-        let currentState = this.$store.getters.currentState
-        let path = currentState.selectedRoot + this.$store.getters.currentPathString
+        let currentState = this.currentState
+        let path = currentState.selectedRoot + this.currentPathString
         let vm = this
         vm.$store.commit('startProgress', {
-          max: currentState.selectedFiles.length
+          max: this.selectedFiles.length
         })
         let fileIndex = 0
 
         function del (index) {
-          let fileName = currentState.selectedFiles.splice(0, 1)
+          let fileName = vm.selectedFiles.splice(0, 1)
           vm.$store.commit('progress', {
             message: fileName,
             progress: fileIndex
@@ -42,7 +50,7 @@
             .then(response => {
               if (response.error) {
                 vm.$store.commit('error', response.error)
-              } else if (currentState.selectedFiles.length === 0) {
+              } else if (vm.selectedFiles.length === 0) {
                 vm.$store.commit('commandFinished')
               } else {
                 fileIndex++
@@ -50,11 +58,12 @@
               }
             })
         }
+
         del()
       }
     },
     created () {
-      this.fileCount = this.$store.getters.currentState.selectedFiles.length
+      this.fileCount = this.selectedFiles.length
       var vm = this
       this.keypress = function (e) {
         if (e.key === 'Enter' && e.target.nodeName !== 'BUTTON') {

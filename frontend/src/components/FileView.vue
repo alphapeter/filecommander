@@ -23,8 +23,6 @@
       </div>
       <file v-for="(file, index) in files"
             :file="file"
-            :selected="selected(file)"
-            :focused="isFocused(file)"
             :key="file.name"
             @click.native="selectFile(file, index, $event)"
             @dblclick.native="changePath(file)">
@@ -36,14 +34,13 @@
 <script>
   import File from './File.vue'
   import FileHeader from './FileHeader.vue'
-  import {Rpc} from '../rpc.js'
-  import {EventBus} from '../EventBus'
+  import { Rpc } from '../rpc.js'
+  import { EventBus } from '../EventBus'
 
   export default{
     props: ['roots', 'id'],
     data: () => {
       return {
-        files: [],
         loading: false,
         eventListener: null,
         focusedFileIndex: -1
@@ -51,33 +48,30 @@
     },
     computed: {
       state () {
-        return this.$store.state.states[this.id]
+        return this.$store.state.views[this.id]
       },
       roots () {
         return this.$store.state.roots
       },
       selectedRoot () {
-        return this.$store.state.states[this.id].selectedRoot
+        return this.$store.state.views[this.id].selectedRoot
       },
       isSelected () {
-        return this.$store.state.selectedState === this.id
+        return this.$store.state.activeView === this.id
       },
       path () {
-        return [this.selectedRoot].concat(this.$store.state.states[this.id].path)
+        return [this.selectedRoot].concat(this.$store.state.views[this.id].path)
       },
       pathString () {
-        return this.$store.state.states[this.id].path.reduce((acc, p) => {
+        return this.$store.state.views[this.id].path.reduce((acc, p) => {
           return acc + '/' + p
         }, '')
       },
-      isViewSelected () {
-        return this.$store.state.selectedState === this.id
+      files () {
+        return this.$store.state.views[this.id].files
       },
       focusedFile () {
-        if (this.files.length) {
-          return this.files[this.focusedFileIndex]
-        }
-        return ''
+        return this.files.find(file => file.focused)
       }
     },
     components: {
@@ -93,27 +87,29 @@
       }
     },
     methods: {
-      selected (file) {
-        return this.$store.state.states[this.id] && this.$store.state.states[this.id].selectedFiles.includes(file.name)
-      },
-      isFocused (file) {
-        return this.focusedFile === file
+      focusFile (index) {
+        this.files.forEach(file => { file.focused = false })
+        this.focusedFileIndex = index
+        if (index >= 0) {
+          this.files[index].focused = true
+        }
       },
       selectFile (file, index, event) {
         if (event.shiftKey) {
           let begin = Math.min(this.focusedFileIndex, index)
           let end = Math.max(this.focusedFileIndex, index) + 1
-          let selectedFiles = this.files
+          this.files.forEach(file => { file.selected = false })
+          this.files
             .slice(begin, end)
-            .map(file => file.name)
-          this.$store.commit('selectFiles', {stateId: this.id, value: selectedFiles})
+            .forEach(file => { file.selected = true })
           return
         } else if (event.ctrlKey) {
-          this.$store.commit('selectFile', {stateId: this.id, value: file.name})
+          file.selected = !file.selected
         } else {
-          this.$store.commit('selectSingleFile', {stateId: this.id, value: file.name})
+          this.files.forEach(file => { file.selected = false })
+          file.selected = true
         }
-        this.focusedFileIndex = index
+        this.focusFile(index)
       },
       selectRootFn (e) {
         this.selectRoot(e.target.value)
@@ -126,11 +122,11 @@
           return
         }
         this.$store.commit('changePath', {stateId: this.id, value: file.name})
-        this.focusedFileIndex = -1
+        this.focusFile(-1)
       },
       changePathToParent () {
         this.$store.commit('changePathToParent', {stateId: this.id})
-        this.focusedFileIndex = -1
+        this.focusFile(-1)
       },
       setPath (index) {
         this.$store.commit('setPath', {stateId: this.id, value: index})
@@ -149,9 +145,13 @@
               response.result.filter((file) => {
                 return file.type === 'f'
               })
-            )
+            ).map(file => {
+              file.selected = false
+              file.focused = false
+              return file
+            })
             vm.loading = false
-            vm.files = files
+            this.$store.state.views[this.id].files = files
           })
       }
     },
@@ -161,25 +161,25 @@
       })
       let vm = this
       this.eventListener = (e) => {
-        if (!vm.isViewSelected || vm.$store.state.ui.state !== 'browse') {
+        if (!vm.isSelected || vm.$store.state.ui.state !== 'browse') {
           return
         }
         switch (e.key) {
           case 'ArrowUp':
             if (e.ctrlKey || e.shiftKey) {
-              vm.$store.commit('selectFile', {stateId: vm.id, value: vm.focusedFile.name})
+              vm.focusedFile.selected = !vm.focusedFile.selected
             }
             let hasParentDirectory = vm.path.length > 1
             let lowerFileIndex = hasParentDirectory
               ? -1
               : 0
-            vm.focusedFileIndex = Math.max(vm.focusedFileIndex - 1, lowerFileIndex)
+            vm.focusFile(Math.max(vm.focusedFileIndex - 1, lowerFileIndex))
             break
           case 'ArrowDown':
             if (e.ctrlKey || e.shiftKey) {
-              vm.$store.commit('selectFile', {stateId: vm.id, value: vm.focusedFile.name})
+              vm.focusedFile.selected = !vm.focusedFile.selected
             }
-            vm.focusedFileIndex = Math.min(vm.focusedFileIndex + 1, vm.files.length - 1)
+            vm.focusFile(Math.min(vm.focusedFileIndex + 1, vm.files.length - 1))
             break
           case 'Tab':
             var newRootSelectionIndex = (vm.roots.indexOf(vm.selectedRoot) + (e.shiftKey ? -1 : 1)) % vm.roots.length
@@ -191,7 +191,7 @@
             e.preventDefault()
             break
           case ' ':
-            vm.$store.commit('selectFile', {stateId: vm.id, value: vm.focusedFile.name})
+            vm.focusedFile.selected = !vm.focusedFile.selected
             break
           case 'Enter':
             if (vm.focusedFileIndex === -1) {

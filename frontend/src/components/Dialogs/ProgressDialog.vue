@@ -37,6 +37,8 @@
 
   .progress {
     background-color: yellow;
+    color: blue;
     height: 100%;
+    text-align: right;
   }
 </style>
