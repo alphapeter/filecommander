@@ -1,12 +1,12 @@
 {
   "roots": [
     {
-      "name": "temp",
-      "path": "c:/temp"
+      "name": "downloads",
+      "path": "c:/users/peter/downloads"
     },
     {
-      "name": "incoming",
-      "path": "c:/incoming"
+      "name": "share",
+      "path": "c:/temp/banana"
     }
   ],
   "binding": "0.0.0.0:8000"

@@ -1,7 +1,12 @@
 # file commander
  
-*Simple Web File Commander*
-
+`Copy`, `move`, `delete` and `rename` files on your server from your web browser.  
+* Easy, single binary installation
+* Multiple platforms (Windows, Linux, OSX)
+* Predefined folder access only
+* Files cannot be uploaded nor downloaded
+ 
+![Image of Yaktocat](screenshot.png)
 # About
 A simple, portable web file commander implemented in the Go language. 
 It compiles into one single binary which bundles all HTML, javascript etc. 
