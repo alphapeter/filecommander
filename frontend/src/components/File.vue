@@ -2,7 +2,7 @@
   <div class="file"
        :class="{'selected': selected, 'focused': focused}"
        tabindex="-1">
-    <div class="fileName">{{file.name}}</div>
+    <div class="fileName" :title="file.name">{{file.name}}</div>
     <div class="fileModified">{{modified(file.modified)}}</div>
     <div class="fileSize" v-if="file.type == 'd'">&lt;dir&gt;</div>
     <div class="fileSize" v-else>{{size(file.size)}}</div>
@@ -21,23 +21,22 @@ export default{
   },
   methods: {
     size (size) {
-      if (size < 1000) {
-        return size
+      if (size < 10000) {
+        return size + 'B'
       }
-      if (size < 1000000) {
-        return Math.round(size / 1000) + 'KB'
+      if (size < 10000000) {
+        return (size / 1024).toString(10).substr(0,4) + 'KB'
       }
-      if (size < 1000000000) {
-        return Math.round(size / 1000000) + 'MB'
+      if (size < 10000000000) {
+        return (size / 1048576).toString(10).substr(0,4) + 'MB'
       }
-
-      if (size < 1000000000000) {
-        return Math.round(size / 1000000000) + 'GB'
+      if (size < 10000000000000) {
+        return (size / 1073741824).toString(10).substr(0,4) + 'GB'
       }
-      if (size < 1000000000000000) {
-        return Math.round(size / 1000000000000) + 'TB'
+      if (size < 10000000000000000) {
+        return (size / 1099511627776).toString(10).substr(0,4) + 'TB'
       }
-      return Math.round(size / 1000000000000000) + 'PB'
+      return (size / 1125899906842624).toString(10).substr(0,4) + 'PB'
     },
     modified (date) {
       return new Date(date).toLocaleString()
