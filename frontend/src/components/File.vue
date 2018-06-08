@@ -25,18 +25,25 @@ export default{
         return size + 'B'
       }
       if (size < 10000000) {
-        return (size / 1024).toString(10).substr(0,4) + 'KB'
+        return this.formatSize((size / 1024)) + 'KB'
       }
       if (size < 10000000000) {
-        return (size / 1048576).toString(10).substr(0,4) + 'MB'
+        return this.formatSize((size / 1048576)) + 'MB'
       }
       if (size < 10000000000000) {
-        return (size / 1073741824).toString(10).substr(0,4) + 'GB'
+        return this.formatSize((size / 1073741824)) + 'GB'
       }
       if (size < 10000000000000000) {
-        return (size / 1099511627776).toString(10).substr(0,4) + 'TB'
+        return this.formatSize((size / 1099511627776)) + 'TB'
       }
-      return (size / 1125899906842624).toString(10).substr(0,4) + 'PB'
+      return this.formatSize((size / 1125899906842624)) + 'PB'
+    },
+    formatSize(size) {
+      var formatted = size.toString(10).substr(0,4)
+
+      return formatted[3] === '.'
+      ? formatted.substr(0,3)
+      : formatted
     },
     modified (date) {
       return new Date(date).toLocaleString()
