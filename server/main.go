@@ -6,33 +6,26 @@ import (
 	"net/http"
 	"github.com/alphapeter/filecommander/server/cfg"
 	"github.com/alphapeter/filecommander/server/commands"
-	"github.com/alphapeter/filecommander/server/gui"
+	"github.com/alphapeter/filecommander/server/static"
 )
 
 func main() {
 	settings := cfg.GetSettings()
 
+	staticHandler := static.CreateHandler(static.Data, "index.html")
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			w.Header().Set("Content-Type", "text/html")
-			w.Write(gui.Html)
+			staticHandler.ServeHTTP(w, r)
 			break
 		default:
 			w.WriteHeader(400)
 			w.Write([]byte("bad request"))
 		}
 	})
-	http.HandleFunc("/static/css/app.css", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/css")
-		w.Write(gui.Css)
 
-	})
-	http.HandleFunc("/static/js/app.js", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(gui.Javascript)
-	})
+	http.HandleFunc("/static/", staticHandler.ServeHTTP)
 
 	http.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {

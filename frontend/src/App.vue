@@ -11,54 +11,54 @@
 </template>
 
 <script>
-  import Actions from './components/Actions.vue'
-  import FileView from './components/FileView.vue'
-  import Header from './components/Header.vue'
-  import Dialogs from './components/Dialogs/Dialogs.vue'
+import Actions from './components/Actions.vue'
+import FileView from './components/FileView.vue'
+import Header from './components/Header.vue'
+import Dialogs from './components/Dialogs/Dialogs.vue'
 
-  export default {
-    name: 'app',
-    components: {
-      Actions,
-      FileView,
-      'appHeader': Header,
-      Dialogs
-    },
-    data () {
-      return {
-        roots: [],
-        selectedView: null
-      }
-    },
-    methods: {
-      selectView (viewId, event) {
-        if (event.target.nodeName === 'SELECT') {
-          return
-        }
-        this.$store.commit('selectView', viewId)
-      }
-    },
-    created () {
-      this.$store.dispatch('init')
-      let vm = this
-      this.eventListener = (e) => {
-        if (vm.$store.state.ui.state !== 'browse') {
-          return
-        }
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-          vm.$store.commit('toggleView')
-          e.preventDefault()
-        }
-      }
-      window.addEventListener('keydown', this.eventListener)
-    },
-    destroyed () {
-      if (this.disableButtons) {
+export default {
+  name: 'app',
+  components: {
+    Actions,
+    FileView,
+    'appHeader': Header,
+    Dialogs
+  },
+  data () {
+    return {
+      roots: [],
+      selectedView: null
+    }
+  },
+  methods: {
+    selectView (viewId, event) {
+      if (event.target.nodeName === 'SELECT') {
         return
       }
-      window.removeEventListener('keydown', this.eventListener)
+      this.$store.commit('selectView', viewId)
     }
+  },
+  created () {
+    this.$store.dispatch('init')
+    let vm = this
+    this.eventListener = (e) => {
+      if (vm.$store.state.ui.state !== 'browse') {
+        return
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        vm.$store.commit('toggleView')
+        e.preventDefault()
+      }
+    }
+    window.addEventListener('keydown', this.eventListener)
+  },
+  destroyed () {
+    if (this.disableButtons) {
+      return
+    }
+    window.removeEventListener('keydown', this.eventListener)
   }
+}
 </script>
 
 <style>

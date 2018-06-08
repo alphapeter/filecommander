@@ -14,21 +14,21 @@
 </template>
 
 <script>
-  import WaitDialog from './WaitDialog.vue'
-  import RenameDialog from './RenameDialog.vue'
-  import MkdirDialog from './MkdirDialog.vue'
-  import ErrorDialog from './ErrorDialog.vue'
-  import DeleteDialog from './DeleteDialog.vue'
-  import ProgressDialog from './ProgressDialog.vue'
+import WaitDialog from './WaitDialog.vue'
+import RenameDialog from './RenameDialog.vue'
+import MkdirDialog from './MkdirDialog.vue'
+import ErrorDialog from './ErrorDialog.vue'
+import DeleteDialog from './DeleteDialog.vue'
+import ProgressDialog from './ProgressDialog.vue'
 
-  export default {
-    components: {
-      WaitDialog,
-      RenameDialog,
-      MkdirDialog,
-      DeleteDialog,
-      ErrorDialog,
-      ProgressDialog
-    }
+export default {
+  components: {
+    WaitDialog,
+    RenameDialog,
+    MkdirDialog,
+    DeleteDialog,
+    ErrorDialog,
+    ProgressDialog
   }
+}
 </script>

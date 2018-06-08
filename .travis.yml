@@ -1,6 +1,9 @@
 language: go
 go:
-  - 1.8.1
+  - "1.10.3"
+
+node_js:
+  - "8.0"
 
 env:
   global:
@@ -9,6 +12,10 @@ env:
     - OUTPUT_PATH=$HOME/release/output
 
 script:
+  - cd frontend
+  - npm install
+  - npm run build
+  - cd ..
   - cd server
   - GOOS=windows GOARCH=386 go build -o $OUTPUT_PATH/windows/x86/filecommander.exe main.go
   - GOOS=windows GOARCH=amd64 go build -o $OUTPUT_PATH/windows/amd64/filecommander.exe main.go
@@ -37,7 +44,6 @@ before_deploy:
 
   - cd $OUTPUT_PATH/windows/amd64
   - zip $ARTIFACT_PATH/filecommander-$TRAVIS_TAG-windows-64bit.zip ./*
-
 
   - cd $OUTPUT_PATH/linux/x86
   - tar -cvzf $ARTIFACT_PATH/filecommander-$TRAVIS_TAG-linux-x86.tar.gz ./*

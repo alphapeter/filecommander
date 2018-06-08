@@ -34,132 +34,132 @@
 </template>
 
 <script>
-  import { Rpc } from '../rpc.js'
-  import { mapGetters } from 'vuex'
-  export default {
-    computed: {
-      buttonsDisabled () {
-        return this.$store.state.views[this.$store.state.activeView] && this.selectedFiles.length === 0
-      },
-      multipleFilesSelected () {
-        return this.$store.state.views[this.$store.state.activeView] && this.selectedFiles.length > 1
-      },
-      ...mapGetters([
-        'selectedFiles',
-        'currentPathString',
-        'otherPathString',
-        'otherState',
-        'focusedFile'
-      ])
+import { Rpc } from '../rpc.js'
+import { mapGetters } from 'vuex'
+export default {
+  computed: {
+    buttonsDisabled () {
+      return this.$store.state.views[this.$store.state.activeView] && this.selectedFiles.length === 0
     },
-    data: () => {
-      return {
-        eventListener: null
-      }
+    multipleFilesSelected () {
+      return this.$store.state.views[this.$store.state.activeView] && this.selectedFiles.length > 1
     },
-    methods: {
-      mkdir () {
-        this.$store.commit('mkdir')
-      },
-      copy () {
-        if (this.buttonsDisabled) {
-          return
-        }
-        this.$store.commit('copyWait')
-        this.executeBinaryCommand('cp')
-      },
-      move () {
-        if (this.buttonsDisabled) {
-          return
-        }
-        this.$store.commit('moveWait')
-        this.executeBinaryCommand('mv')
-      },
-      deleteFile () {
-        if (this.buttonsDisabled) {
-          return
-        }
-        this.$store.commit('deleteFile')
-      },
-      rename () {
-        if (this.buttonsDisabled || this.multipleFilesSelected) {
-          return
-        }
-        this.$store.commit('rename')
-      },
-      executeBinaryCommand (command) {
-        let currentState = this.$store.getters.currentState
-        let currentPath = currentState.selectedRoot + '/' + this.currentPathString
-        let otherPath = this.otherState.selectedRoot + '/' + this.otherPathString
-
-        let vm = this
-        vm.$store.commit('startProgress', {
-          max: this.selectedFiles.length
-        })
-        let fileIndex = 0
-
-        function run (index) {
-          let fileName = vm.selectedFiles.splice(0, 1)[0]
-          vm.$store.commit('progress', {
-            message: fileName,
-            progress: fileIndex
-          })
-          Rpc.call(command, [currentPath + '/' + fileName, otherPath + '/' + fileName])
-            .then(response => {
-              if (response.error) {
-                vm.$store.commit('error', response.error)
-              } else if (vm.selectedFiles.length === 0) {
-                vm.$store.commit('commandFinished')
-              } else {
-                fileIndex++
-                run()
-              }
-            })
-        }
-
-        run()
-      }
+    ...mapGetters([
+      'selectedFiles',
+      'currentPathString',
+      'otherPathString',
+      'otherState',
+      'focusedFile'
+    ])
+  },
+  data: () => {
+    return {
+      eventListener: null
+    }
+  },
+  methods: {
+    mkdir () {
+      this.$store.commit('mkdir')
     },
-    created () {
-      let vm = this
-      this.eventListener = (e) => {
-        if (vm.$store.state.ui.state !== 'browse') {
-          return
-        }
-        switch (e.key) {
-          case 'r':
-            this.rename()
-            break
-          case 'Insert':
-          case 'n':
-            this.mkdir()
-            break
-          case 'c':
-            this.copy()
-            break
-          case 'm':
-            this.move()
-            break
-          case 'Delete':
-          case 'd':
-            this.deleteFile()
-            break
-          default:
-            break
-        }
-        if (e.key === 'Escape') {
-          vm.$store.state.uiState = 'browse'
-        }
-      }
-      window.addEventListener('keyup', this.eventListener)
-    },
-    destroyed () {
-      if (this.disableButtons) {
+    copy () {
+      if (this.buttonsDisabled) {
         return
       }
-      window.removeEventListener('keyup', this.eventListener)
+      this.$store.commit('copyWait')
+      this.executeBinaryCommand('cp')
+    },
+    move () {
+      if (this.buttonsDisabled) {
+        return
+      }
+      this.$store.commit('moveWait')
+      this.executeBinaryCommand('mv')
+    },
+    deleteFile () {
+      if (this.buttonsDisabled) {
+        return
+      }
+      this.$store.commit('deleteFile')
+    },
+    rename () {
+      if (this.buttonsDisabled || this.multipleFilesSelected) {
+        return
+      }
+      this.$store.commit('rename')
+    },
+    executeBinaryCommand (command) {
+      let currentState = this.$store.getters.currentState
+      let currentPath = currentState.selectedRoot + '/' + this.currentPathString
+      let otherPath = this.otherState.selectedRoot + '/' + this.otherPathString
+
+      let vm = this
+      vm.$store.commit('startProgress', {
+        max: this.selectedFiles.length
+      })
+      let fileIndex = 0
+
+      function run (index) {
+        let fileName = vm.selectedFiles.splice(0, 1)[0]
+        vm.$store.commit('progress', {
+          message: fileName,
+          progress: fileIndex
+        })
+        Rpc.call(command, [currentPath + '/' + fileName, otherPath + '/' + fileName])
+          .then(response => {
+            if (response.error) {
+              vm.$store.commit('error', response.error)
+            } else if (vm.selectedFiles.length === 0) {
+              vm.$store.commit('commandFinished')
+            } else {
+              fileIndex++
+              run()
+            }
+          })
+      }
+
+      run()
     }
+  },
+  created () {
+    let vm = this
+    this.eventListener = (e) => {
+      if (vm.$store.state.ui.state !== 'browse') {
+        return
+      }
+      switch (e.key) {
+        case 'r':
+          this.rename()
+          break
+        case 'Insert':
+        case 'n':
+          this.mkdir()
+          break
+        case 'c':
+          this.copy()
+          break
+        case 'm':
+          this.move()
+          break
+        case 'Delete':
+        case 'd':
+          this.deleteFile()
+          break
+        default:
+          break
+      }
+      if (e.key === 'Escape') {
+        vm.$store.state.uiState = 'browse'
+      }
+    }
+    window.addEventListener('keyup', this.eventListener)
+  },
+  destroyed () {
+    if (this.disableButtons) {
+      return
+    }
+    window.removeEventListener('keyup', this.eventListener)
   }
+}
 </script>
 
 <style>

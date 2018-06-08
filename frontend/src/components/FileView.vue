@@ -2,12 +2,13 @@
   <div class="fileview" :class="{selected: isSelected}">
     <span v-for="(p, i) in path"
           @click="setPath(i)"
+          :key="p"
           class="path">/{{p}}</span>
     <select class="rootSelector"
             @change="selectRootFn"
             :value="selectedRoot"
             title="choose server root">
-      <option v-for="root in roots">{{root}}</option>
+      <option v-for="root in roots" :key="root">{{root}}</option>
     </select>
     <div class="reload-files"
          role="button"
@@ -32,188 +33,188 @@
 </template>
 
 <script>
-  import File from './File.vue'
-  import FileHeader from './FileHeader.vue'
-  import { Rpc } from '../rpc.js'
-  import { EventBus } from '../EventBus'
+import File from './File.vue'
+import FileHeader from './FileHeader.vue'
+import { Rpc } from '../rpc.js'
+import { EventBus } from '../EventBus'
 
-  export default{
-    props: ['roots', 'id'],
-    data: () => {
-      return {
-        loading: false,
-        eventListener: null,
-        focusedFileIndex: -1
-      }
-    },
-    computed: {
-      state () {
-        return this.$store.state.views[this.id]
-      },
-      roots () {
-        return this.$store.state.roots
-      },
-      selectedRoot () {
-        return this.$store.state.views[this.id].selectedRoot
-      },
-      isSelected () {
-        return this.$store.state.activeView === this.id
-      },
-      path () {
-        return [this.selectedRoot].concat(this.$store.state.views[this.id].path)
-      },
-      pathString () {
-        return this.$store.state.views[this.id].path.reduce((acc, p) => {
-          return acc + '/' + p
-        }, '')
-      },
-      files () {
-        return this.$store.state.views[this.id].files
-      },
-      focusedFile () {
-        return this.files.find(file => file.focused)
-      }
-    },
-    components: {
-      File,
-      FileHeader
-    },
-    watch: {
-      selectedRoot () {
-        this.reloadFiles()
-      },
-      path () {
-        this.reloadFiles()
-      }
-    },
-    methods: {
-      focusFile (index) {
-        this.files.forEach(file => { file.focused = false })
-        this.focusedFileIndex = index
-        if (index >= 0) {
-          this.files[index].focused = true
-        }
-      },
-      selectFile (file, index, event) {
-        if (event.shiftKey) {
-          let begin = Math.min(this.focusedFileIndex, index)
-          let end = Math.max(this.focusedFileIndex, index) + 1
-          this.files.forEach(file => { file.selected = false })
-          this.files
-            .slice(begin, end)
-            .forEach(file => { file.selected = true })
-          return
-        } else if (event.ctrlKey) {
-          file.selected = !file.selected
-        } else {
-          this.files.forEach(file => { file.selected = false })
-          file.selected = true
-        }
-        this.focusFile(index)
-      },
-      selectRootFn (e) {
-        this.selectRoot(e.target.value)
-      },
-      selectRoot (rootName) {
-        this.$store.commit('selectRoot', {stateId: this.id, value: rootName})
-      },
-      changePath (file) {
-        if (file.type === 'f') {
-          return
-        }
-        this.$store.commit('changePath', {stateId: this.id, value: file.name})
-        this.focusFile(-1)
-      },
-      changePathToParent () {
-        this.$store.commit('changePathToParent', {stateId: this.id})
-        this.focusFile(-1)
-      },
-      setPath (index) {
-        this.$store.commit('setPath', {stateId: this.id, value: index})
-      },
-      reloadFiles () {
-        let vm = this
-        if (this.loading) {
-          return
-        }
-        this.loading = true
-        Rpc.call('ls', [this.selectedRoot + this.pathString])
-          .then((response) => {
-            let files = response.result.filter((file) => {
-              return file.type === 'd'
-            }).concat(
-              response.result.filter((file) => {
-                return file.type === 'f'
-              })
-            ).map(file => {
-              file.selected = false
-              file.focused = false
-              return file
-            })
-            vm.loading = false
-            this.$store.state.views[this.id].files = files
-          })
-      }
-    },
-    created () {
-      EventBus.$on('commandFinished', () => {
-        this.reloadFiles()
-      })
-      let vm = this
-      this.eventListener = (e) => {
-        if (!vm.isSelected || vm.$store.state.ui.state !== 'browse') {
-          return
-        }
-        switch (e.key) {
-          case 'ArrowUp':
-            if (e.ctrlKey || e.shiftKey) {
-              vm.focusedFile.selected = !vm.focusedFile.selected
-            }
-            let hasParentDirectory = vm.path.length > 1
-            let lowerFileIndex = hasParentDirectory
-              ? -1
-              : 0
-            vm.focusFile(Math.max(vm.focusedFileIndex - 1, lowerFileIndex))
-            break
-          case 'ArrowDown':
-            if (e.ctrlKey || e.shiftKey) {
-              vm.focusedFile.selected = !vm.focusedFile.selected
-            }
-            vm.focusFile(Math.min(vm.focusedFileIndex + 1, vm.files.length - 1))
-            break
-          case 'Tab':
-            var newRootSelectionIndex = (vm.roots.indexOf(vm.selectedRoot) + (e.shiftKey ? -1 : 1)) % vm.roots.length
-            if (newRootSelectionIndex < 0) {
-              newRootSelectionIndex = vm.roots.length - 1
-            }
-            let newRootSelection = vm.roots[newRootSelectionIndex]
-            vm.selectRoot(newRootSelection)
-            e.preventDefault()
-            break
-          case ' ':
-            vm.focusedFile.selected = !vm.focusedFile.selected
-            break
-          case 'Enter':
-            if (vm.focusedFileIndex === -1) {
-              vm.changePathToParent()
-            } else {
-              vm.changePath(vm.focusedFile)
-            }
-            break
-          case 'u':
-            vm.reloadFiles()
-            break
-          default:
-            return
-        }
-        e.preventDefault()
-      }
-      window.addEventListener('keydown', this.eventListener)
-    },
-    destroyed () {
-      window.removeEventListener('keydown', this.eventListener)
+export default{
+  props: ['id'],
+  data: () => {
+    return {
+      loading: false,
+      eventListener: null,
+      focusedFileIndex: -1
     }
+  },
+  computed: {
+    state () {
+      return this.$store.state.views[this.id]
+    },
+    roots () {
+      return this.$store.state.roots
+    },
+    selectedRoot () {
+      return this.$store.state.views[this.id].selectedRoot
+    },
+    isSelected () {
+      return this.$store.state.activeView === this.id
+    },
+    path () {
+      return [this.selectedRoot].concat(this.$store.state.views[this.id].path)
+    },
+    pathString () {
+      return this.$store.state.views[this.id].path.reduce((acc, p) => {
+        return acc + '/' + p
+      }, '')
+    },
+    files () {
+      return this.$store.state.views[this.id].files
+    },
+    focusedFile () {
+      return this.files.find(file => file.focused)
+    }
+  },
+  components: {
+    File,
+    FileHeader
+  },
+  watch: {
+    selectedRoot () {
+      this.reloadFiles()
+    },
+    path () {
+      this.reloadFiles()
+    }
+  },
+  methods: {
+    focusFile (index) {
+      this.files.forEach(file => { file.focused = false })
+      this.focusedFileIndex = index
+      if (index >= 0) {
+        this.files[index].focused = true
+      }
+    },
+    selectFile (file, index, event) {
+      if (event.shiftKey) {
+        let begin = Math.min(this.focusedFileIndex, index)
+        let end = Math.max(this.focusedFileIndex, index) + 1
+        this.files.forEach(file => { file.selected = false })
+        this.files
+          .slice(begin, end)
+          .forEach(file => { file.selected = true })
+        return
+      } else if (event.ctrlKey) {
+        file.selected = !file.selected
+      } else {
+        this.files.forEach(file => { file.selected = false })
+        file.selected = true
+      }
+      this.focusFile(index)
+    },
+    selectRootFn (e) {
+      this.selectRoot(e.target.value)
+    },
+    selectRoot (rootName) {
+      this.$store.commit('selectRoot', {stateId: this.id, value: rootName})
+    },
+    changePath (file) {
+      if (file.type === 'f') {
+        return
+      }
+      this.$store.commit('changePath', {stateId: this.id, value: file.name})
+      this.focusFile(-1)
+    },
+    changePathToParent () {
+      this.$store.commit('changePathToParent', {stateId: this.id})
+      this.focusFile(-1)
+    },
+    setPath (index) {
+      this.$store.commit('setPath', {stateId: this.id, value: index})
+    },
+    reloadFiles () {
+      let vm = this
+      if (this.loading) {
+        return
+      }
+      this.loading = true
+      Rpc.call('ls', [this.selectedRoot + this.pathString])
+        .then((response) => {
+          let files = response.result.filter((file) => {
+            return file.type === 'd'
+          }).concat(
+            response.result.filter((file) => {
+              return file.type === 'f'
+            })
+          ).map(file => {
+            file.selected = false
+            file.focused = false
+            return file
+          })
+          vm.loading = false
+          this.$store.state.views[this.id].files = files
+        })
+    }
+  },
+  created () {
+    EventBus.$on('commandFinished', () => {
+      this.reloadFiles()
+    })
+    let vm = this
+    this.eventListener = (e) => {
+      if (!vm.isSelected || vm.$store.state.ui.state !== 'browse') {
+        return
+      }
+      switch (e.key) {
+        case 'ArrowUp':
+          if (e.ctrlKey || e.shiftKey) {
+            vm.focusedFile.selected = !vm.focusedFile.selected
+          }
+          let hasParentDirectory = vm.path.length > 1
+          let lowerFileIndex = hasParentDirectory
+            ? -1
+            : 0
+          vm.focusFile(Math.max(vm.focusedFileIndex - 1, lowerFileIndex))
+          break
+        case 'ArrowDown':
+          if (e.ctrlKey || e.shiftKey) {
+            vm.focusedFile.selected = !vm.focusedFile.selected
+          }
+          vm.focusFile(Math.min(vm.focusedFileIndex + 1, vm.files.length - 1))
+          break
+        case 'Tab':
+          var newRootSelectionIndex = (vm.roots.indexOf(vm.selectedRoot) + (e.shiftKey ? -1 : 1)) % vm.roots.length
+          if (newRootSelectionIndex < 0) {
+            newRootSelectionIndex = vm.roots.length - 1
+          }
+          let newRootSelection = vm.roots[newRootSelectionIndex]
+          vm.selectRoot(newRootSelection)
+          e.preventDefault()
+          break
+        case ' ':
+          vm.focusedFile.selected = !vm.focusedFile.selected
+          break
+        case 'Enter':
+          if (vm.focusedFileIndex === -1) {
+            vm.changePathToParent()
+          } else {
+            vm.changePath(vm.focusedFile)
+          }
+          break
+        case 'u':
+          vm.reloadFiles()
+          break
+        default:
+          return
+      }
+      e.preventDefault()
+    }
+    window.addEventListener('keydown', this.eventListener)
+  },
+  destroyed () {
+    window.removeEventListener('keydown', this.eventListener)
   }
+}
 </script>
 
 <style>

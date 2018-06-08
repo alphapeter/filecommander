@@ -10,20 +10,20 @@
 </template>
 
 <script>
-  import Modal from './Modal.vue'
-  export default {
-    components: {
-      Modal
+import Modal from './Modal.vue'
+export default {
+  components: {
+    Modal
+  },
+  computed: {
+    progress () {
+      return this.$store.state.ui.progress.progress + '/' + this.$store.state.ui.progress.max
     },
-    computed: {
-      progress () {
-        return this.$store.state.ui.progress.progress + '/' + this.$store.state.ui.progress.max
-      },
-      width () {
-        return (100 / this.$store.state.ui.progress.max) * this.$store.state.ui.progress.progress + '%'
-      }
+    width () {
+      return (100 / this.$store.state.ui.progress.max) * this.$store.state.ui.progress.progress + '%'
     }
   }
+}
 </script>
 
 <style>
