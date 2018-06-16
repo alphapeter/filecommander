@@ -38,7 +38,7 @@ import FileHeader from './FileHeader.vue'
 import { Rpc } from '../rpc.js'
 import { EventBus } from '../EventBus'
 
-export default{
+export default {
   props: ['id'],
   data: () => {
     return {
@@ -140,17 +140,19 @@ export default{
       this.loading = true
       Rpc.call('ls', [this.selectedRoot + this.pathString])
         .then((response) => {
-          let files = response.result.filter((file) => {
-            return file.type === 'd'
-          }).concat(
-            response.result.filter((file) => {
-              return file.type === 'f'
+          let files = response.result.filter((file) => { return file.type === 'd' })
+          files.sort((a, b) => a.name.localeCompare(b.name))
+
+          let directories = response.result.filter((file) => { return file.type === 'f' })
+          directories.sort((a, b) => a.name.localeCompare(b.name))
+
+          files = files.concat(directories)
+            .map(file => {
+              file.selected = false
+              file.focused = false
+              return file
             })
-          ).map(file => {
-            file.selected = false
-            file.focused = false
-            return file
-          })
+
           vm.loading = false
           this.$store.state.views[this.id].files = files
         })

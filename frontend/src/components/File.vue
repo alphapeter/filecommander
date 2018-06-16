@@ -9,7 +9,7 @@
   </div>
 </template>
 <script>
-export default{
+export default {
   props: ['file'],
   computed: {
     selected () {
@@ -38,12 +38,12 @@ export default{
       }
       return this.formatSize((size / 1125899906842624)) + 'PB'
     },
-    formatSize(size) {
-      var formatted = size.toString(10).substr(0,4)
+    formatSize (size) {
+      var formatted = size.toString(10).substr(0, 4)
 
       return formatted[3] === '.'
-      ? formatted.substr(0,3)
-      : formatted
+        ? formatted.substr(0, 3)
+        : formatted
     },
     modified (date) {
       return new Date(date).toLocaleString()

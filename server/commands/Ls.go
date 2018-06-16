@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-func (command Command) Ls() ([]File, error){
-	if err := command.validateUnaryParameters(); err != nil{
+func (command Command) Ls() ([]File, error) {
+	if err := command.validateUnaryParameters(); err != nil {
 		return nil, err
 	}
 	return ls(command.Params[0])
@@ -19,7 +19,7 @@ func ls(directory string) ([]File, error) {
 	}
 
 	files, _ := ioutil.ReadDir(path)
-	response := []File{}
+	var response []File
 
 	for _, file := range files {
 		f := File{Name: file.Name(), Size: file.Size(), Modified: file.ModTime()}
@@ -34,8 +34,8 @@ func ls(directory string) ([]File, error) {
 }
 
 type File struct {
-	Type string `json:"type"`
-	Name string `json:"name"`
+	Type     string    `json:"type"`
+	Name     string    `json:"name"`
 	Modified time.Time `json:"modified"`
-	Size int64 `json:"size"`
+	Size     int64     `json:"size"`
 }
