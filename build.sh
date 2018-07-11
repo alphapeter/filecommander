@@ -1,8 +1,8 @@
 #!/bin/bash
 
 echo GOPATH: $GOPATH
-echo GOVERSION: 
 go version
+echo Node version $(node -v)
 BASE_PATH=/go/src/github.com/alphapeter/filecommander
 SETTINGS_PATH=$BASE_PATH/exampleconfig
 ARTIFACT_PATH=$BASE_PATH/release/artifacts
@@ -34,20 +34,4 @@ cp $SETTINGS_PATH/linux/settings.json $OUTPUT_PATH/linux/x86/
 cp $SETTINGS_PATH/linux/settings.json $OUTPUT_PATH/linux/amd64/
 
 cp $SETTINGS_PATH/linux/settings.json $OUTPUT_PATH/osx/
-
-mkdir $ARTIFACT_PATH
-
-cd $OUTPUT_PATH/windows/x86/
-zip $ARTIFACT_PATH/filecommander-$TRAVIS_TAG-windows-32bit.zip ./*
-
-cd $OUTPUT_PATH/windows/amd64
-zip $ARTIFACT_PATH/filecommander-$TRAVIS_TAG-windows-64bit.zip ./*
-
-cd $OUTPUT_PATH/linux/x86
-tar -cvzf $ARTIFACT_PATH/filecommander-$TRAVIS_TAG-linux-x86.tar.gz ./*
-cd $OUTPUT_PATH/linux/amd64
-tar -cvzf $ARTIFACT_PATH/filecommander-$TRAVIS_TAG-linux-amd64.tar.gz ./*
-
-cd $OUTPUT_PATH/osx
-zip $ARTIFACT_PATH/filecommander-$TRAVIS_TAG-osx.zip ./*
 
