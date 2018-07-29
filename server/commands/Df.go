@@ -14,7 +14,7 @@ func (command Command) Df() ([]string, error){
 
 func df() ([]string, error) {
 	settings := cfg.GetSettings()
-	rootNames := []string{}
+	rootNames := make([]string, 0)
 	for i := 0; i < len(settings.Roots); i++ {
 		rootNames = append(rootNames, settings.Roots[i].Name)
 	}

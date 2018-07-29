@@ -19,7 +19,7 @@ func ls(directory string) ([]File, error) {
 	}
 
 	files, _ := ioutil.ReadDir(path)
-	var response []File
+	response := make([]File, 0)
 
 	for _, file := range files {
 		f := File{Name: file.Name(), Size: file.Size(), Modified: file.ModTime()}
